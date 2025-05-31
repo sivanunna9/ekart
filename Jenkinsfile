@@ -4,12 +4,6 @@ pipeline {
     triggers {
         cron('H/2 * * * 1-5')
     }
-
-    tools {
-        maven 'Maven3'
-        jdk 'java8'
-    }
-
     stages {
         stage('Checkout') {
             steps {
