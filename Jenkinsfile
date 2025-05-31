@@ -1,31 +1,33 @@
 pipeline {
     agent any
+
     triggers {
         cron('H/2 * * * 1-5')
     }
+
     tools {
         maven 'Maven3'
         jdk 'java8'
-      
     }
+
     stages {
-      stage('Checkout') {
-                steps {
-                                checkout scm                           
-                }
-                    }
-       
-        stage ('Build') {
+        stage('Checkout') {
             steps {
-                sh """
-                 cd $WORKSPACE/
-                 docker build -f Dockerfile -t ekart .
-                 """
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                    docker build -f Dockerfile -t ekart .
+                '''
             }
             post {
                 success {
-                    junit 'target/surefire-reports/**/*.xml' 
+                    junit 'target/surefire-reports/**/*.xml'
                 }
-            }  
+            }
         }
-    
+    }
+}
