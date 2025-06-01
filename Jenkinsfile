@@ -17,11 +17,7 @@ pipeline {
                     docker build -f Dockerfile -t ekart .
                 '''
             }
-            post {
-                success {
-                    junit 'target/surefire-reports/**/*.xml'
-                }
-            }
+            
         }
     }
 }
