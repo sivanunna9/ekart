@@ -23,9 +23,8 @@ pipeline {
         }
         stage('docker-build') {
             steps {
-                echo "Building Docker image for build number ${BUILD_NUMBER}"
-                cd ${WORKSPACE}
-                docker build -t ekart:${BUILD_NUMBER} .
+                echo "Building Docker image for build number ${env.BUILD_NUMBER}"
+                sh "docker build -t ekart:${env.BUILD_NUMBER} ."
             }
         }
         stage('docker-push') {
