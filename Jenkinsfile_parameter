@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'master', description: 'Branch to build'),
+        credentialsId(name: 'DOCKERHUB_CREDENTIALS', description: 'Credentials for Docker Hub')
+    }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                echo "Cloning repository ${params.BRANCH_NAME}"
+                git branch: params.BRANCH_NAME, changelog: false, credentialsId: 'sivanunna9', poll: false, url: 'git@github.com:testingdevops123/ekart.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Building branch ${params.BRANCH_NAME}"
+                script {
+                    def mvnHome = tool name: 'M3', type: 'maven'
+                    sh "${mvnHome}/bin/mvn clean install"
+                }
+            }
+        }
+        stage('docker-build') {
+            steps {
+                echo "Building Docker image for build number ${BUILD_NUMBER}"
+                cd ${WORKSPACE}
+                docker build -t ekart:${BUILD_NUMBER} .
+            }
+        }
+        stage('docker-push') {
+            steps {
+                echo "Pushing Docker image for build number ${BUILD_NUMBER} to Docker Hub"
+                withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    sh '''
+                        echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+                        docker tag ekart:${BUILD_NUMBER} $DOCKERHUB_USER/ekart:${BUILD_NUMBER}
+                        docker push $DOCKERHUB_USER/ekart:${BUILD_NUMBER}
+                    '''
+                }
+            }
+        }
+
+        stage('docker-run') {
+            steps {
+                echo "Running Docker container for build number ${BUILD_NUMBER}"
+                # docker run --rm -d -p 8080:8080 ekart:${BUILD_NUMBER}
+            }
+        }
+    }
+}
