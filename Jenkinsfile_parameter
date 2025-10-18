@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent label {'ubuntu-agent2'}
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'master', description: 'Branch to build')
         credentials(name: 'DOCKERHUB_CREDENTIALS', description: 'Credentials for Docker Hub')
