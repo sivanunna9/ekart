@@ -43,7 +43,7 @@ pipeline {
         stage('docker-run') {
             steps {
                 echo "Running Docker container for build number ${BUILD_NUMBER}"
-                # docker run --rm -d -p 8080:8080 ekart:${BUILD_NUMBER}
+                // docker run --rm -d -p 8080:8080 ekart:${BUILD_NUMBER}
             }
         }
     }
